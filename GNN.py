@@ -21,21 +21,20 @@ class GraphAttentionLayer(nn.Module):
         self.a_neighs = nn.Parameter(torch.zeros(size=(out_features, 1)))
         nn.init.kaiming_uniform_(self.a_neighs.data, a=0,mode='fan_out',nonlinearity='leaky_relu') 
 
-        self.leakyrelu = nn.LeakyReLU(self.alpha)       #激活函数
+        self.leakyrelu = nn.LeakyReLU(self.alpha)       
 
     def forward(self, input, adj, M, concat=True):    # input [N, in_features]
-        h = torch.mm(input, self.W)                   # shape [N, out_features] ,h是对输入特征降维后的矩阵，对应论文里的h'，N是点的个数
-        #前馈神经网络
+        h = torch.mm(input, self.W)                   # shape [N, out_features] 
+
         attn_for_self = torch.mm(h,self.a_self)       #(N,1)
         attn_for_neighs = torch.mm(h,self.a_neighs)   #(N,1)
-        attn_dense = attn_for_self + torch.transpose(attn_for_neighs,0,1)  #(N,N) 论文中Fig1左图
+        attn_dense = attn_for_self + torch.transpose(attn_for_neighs,0,1)  #(N,N) 
         attn_dense = torch.mul(attn_dense,M)                # [N, N]*[N, N]=>[N, N]
         attn_dense = self.leakyrelu(attn_dense)             #(N,N)
 
-        #掩码（邻接矩阵掩码）
         zero_vec = -9e15*torch.ones_like(adj)               #(N,N)
         adj = torch.where(adj > 0, attn_dense, zero_vec)
-        attention = F.softmax(adj, dim=1)                   # 对每一行的样本所有邻居softmax,归一化
+        attention = F.softmax(adj, dim=1)                   
         h_prime = torch.matmul(attention,h)                 # N, output_feat
 
         if concat:
@@ -70,11 +69,4 @@ class SELayer(nn.Module):
         nozero_vec = min_val*torch.ones_like(y) 
         y = torch.where(y > 0, y, nozero_vec)
         return x * y.expand_as(x)
-
-
-
-
-
-
-        
 
