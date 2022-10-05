@@ -8,7 +8,7 @@ def cluster_prc_f1(y_true, y_pred):
     y_pred = list(y_pred)
     n_class = len(set(y_pred))
     y_pred[:] = [y - min(y_pred) for y in y_pred]
-    while(max(y_pred) != n_class - 1):      # 中间有序号丢失
+    while(max(y_pred) != n_class - 1):      
         for k in range(n_class):
             if k in y_pred:
                 continue
@@ -74,7 +74,7 @@ def compactness(y_pred, z):
     x,dim_f = z.shape
     y_pred[:] = [y - min(y_pred) for y in y_pred]
     n = 0
-    while(max(y_pred) != n_class - 1):      # 中间有序号丢失
+    while(max(y_pred) != n_class - 1):      
         for k in range(n_class):
             if k in y_pred:
                 continue
@@ -91,7 +91,7 @@ def compactness(y_pred, z):
         cp = 0
         clusters_ind = [j for j,y in enumerate(y_pred) if y == i]
         C = torch.stack([z[ind] for ind in clusters_ind],0)
-        CM = torch.mean(C,dim=0)        # 簇中心      
+        CM = torch.mean(C,dim=0)              
         for ind in clusters_ind:
             cp += torch.sum(torch.pow(CM - z[ind],2)).sqrt()
         cp = cp/len(clusters_ind)
@@ -105,7 +105,7 @@ def separation(y_pred, z):
     x,dim_f = z.shape
     y_pred[:] = [y - min(y_pred) for y in y_pred]
     n = 0
-    while(max(y_pred) != n_class - 1):      # 中间有序号丢失
+    while(max(y_pred) != n_class - 1):    
         for k in range(n_class):
             if k in y_pred:
                 continue
@@ -144,7 +144,7 @@ def DVI(y_pred, z):
     x,dim_f = z.shape
     y_pred[:] = [y - min(y_pred) for y in y_pred]
     n = 0
-    while(max(y_pred) != n_class - 1):      # 中间有序号丢失
+    while(max(y_pred) != n_class - 1):    
         for k in range(n_class):
             if k in y_pred:
                 continue
